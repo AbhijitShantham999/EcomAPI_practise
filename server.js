@@ -1,5 +1,6 @@
 import express from "express";
 import dotenv from "dotenv";
+import cookieParser from "cookie-parser";
 import { connectDB } from "./config/db.config.js";
 
 import userRouter from "./routes/user.route.js";
@@ -10,6 +11,8 @@ import userRouter from "./routes/user.route.js";
 dotenv.config();
 
 const app = express();
+app.use(cookieParser());
+app.use(express.urlencoded({ extended: true }));
 const PORT = process.env.PORT || 3000; // Fallback port
 
 // Middleware to parse JSON
