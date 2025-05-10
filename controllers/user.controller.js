@@ -1,6 +1,5 @@
-import jwt from "jsonwebtoken";
-
 import { User } from "../models/user.model.js";
+import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 
 export const register = async (req, res) => {
@@ -20,7 +19,7 @@ export const register = async (req, res) => {
     const user = await User.create({ name, username, email, password, role });
     // create a JWT token
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, email: user.email, isAdmin: user.role },
       process.env.JWT_SECRET_KEY
     );
     // Set the token in a cookie
@@ -30,7 +29,7 @@ export const register = async (req, res) => {
     });
     return res
       .status(201)
-      .json({ message: "User Registered Successfully" }, user);
+      .json({ message: "User Registered Successfully", user: user });
   } catch (error) {
     console.log("Error while Registering User", error);
     return res.status(500).json({ error: "Registration failed" });
@@ -72,16 +71,23 @@ export const login = async (req, res) => {
     else {
       // create a JWT token
       const token = jwt.sign(
-        { id: existingUser._id, email: existingUser.email },
-        process.env.JWT_SECRET_KEY
+        {
+          id: existingUser._id,
+          email: existingUser.email,
+          isAdmin: existingUser.role,
+        },
+        process.env.JWT_SECRET_KEY,
+        { expiresIn: "7d" }
       );
       // Set the token in a cookie
       res.cookie("token", token, {
         httpOnly: true, // Prevents client-side JS access
-        secure: true, // Only sent over HTTPS
+        secure: false, // Only sent over HTTPS
       });
       console.log("Logged in successfully");
-      return res.status(200).json({ message: "Logged in Successfully" });
+      return res
+        .status(200)
+        .json({ message: "Logged in Successfully", user: existingUser });
     }
   } catch (error) {
     console.log("Error while LOGIN", error);
@@ -96,6 +102,7 @@ export const logout = async (req, res) => {
       httpOnly: true, // Prevents client-side JS access
       secure: true, // Only sent over HTTPS
     });
+    console.log("Logged out Successfully");
     return res.status(200).json({ message: "Logout Successfully" });
   } catch (error) {
     console.log("Error while LOGOUT", error);

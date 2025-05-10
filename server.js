@@ -4,7 +4,7 @@ import cookieParser from "cookie-parser";
 import { connectDB } from "./config/db.config.js";
 
 import userRouter from "./routes/user.route.js";
-// import productRouter from "./routes/product.route.js";
+import productRouter from "./routes/product.route.js";
 // import orderRouter from "./routes/order.route.js";
 // import paymentRouter from "./routes/payment.route.js"
 
@@ -24,9 +24,9 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/user", userRouter);
-// app.use("api/v1/product", productRouter);
-// app.use("api/v1/order", orderRouter);
-// app.use("api/v1/payment", paymentRouter);
+app.use("/api/v1/products", productRouter);
+// app.use("/api/v1/order", orderRouter);
+// app.use("/api/v1/payment", paymentRouter);
 
 connectDB()
   .then(() => {
@@ -37,4 +37,3 @@ connectDB()
   .catch((err) => {
     console.error("Failed to connect to MongoDB:", err);
   });
-
